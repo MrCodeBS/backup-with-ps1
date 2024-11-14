@@ -1,13 +1,32 @@
-###how to run:###
- powershell.exe -File backup-script.ps1
-**important**
-The command powershell.exe -ep bypass is used to run PowerShell with the execution policy set to Bypass. This allows PowerShell scripts to run without prompting for user confirmation or modification of the system’s default execution policy
-Examples and code snippets
-Run PowerShell with the -ep bypass option:
+### How to Run the Backup Script
+
+To execute the backup script, use the following command:
+
+```powershell
+powershell.exe -File backup-script.ps1
+```
+
+---
+
+**Important Note:**  
+To bypass PowerShell's default execution policy and run scripts without user confirmation, use the `-ep bypass` option. This sets the execution policy to **Bypass** temporarily, allowing scripts to execute even if restrictions are in place.
+
+### Examples
+
+#### 1. Run a PowerShell Script with Execution Policy Bypass
+To execute a script directly with the bypass option, use:
+```powershell
 powershell.exe -ep bypass -File C:\Path\To\Script.ps1
+```
 
-Set the execution policy to Bypass for a specific script:
+#### 2. Set Execution Policy to Bypass for a Specific User
+To permanently set the execution policy to Bypass for the current user:
+```powershell
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force
+```
 
-Use the -ep bypass option in a batch file or script to run PowerShell:
+#### 3. Using `-ep bypass` in a Batch File or Another Script
+You can integrate `-ep bypass` in batch files or other scripts to avoid permission issues:
+```powershell
 powershell.exe -ep bypass -Command "Get-ChildItem C:\Path\To\Folder"
+```
