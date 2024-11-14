@@ -79,12 +79,14 @@ try {
     # Clean up old backups
     Remove-OldBackups
 
-    Write-Host "`nBackup completed successfully. Press any key to exit..."
+    Write-Host "`nBackup completed successfully. Logfile: $logFile"
+    Write-Host "Press any key to exit..."
     $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
 
 } catch {
     Write-Log "ERROR: $($_.Exception.Message)"
-    Write-Host "`nPress any key to exit..."
+    Write-Host "`nAn error occurred. Check the logfile: $logFile"
+    Write-Host "Press any key to exit..."
     $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
     exit 1
 }
