@@ -1,41 +1,90 @@
-# Simple Backup Script
-$ErrorActionPreference = "Stop"  # Makes all errors terminating
+# Backup Script
+# Creates a dated backup of specified source directory to destination directory
 
-# Configuration - EDIT THESE PATHS
-$sourceDirectory = "$env:USERPROFILE\Documents"  # Default to user's Documents folder
-$backupDirectory = "$env:USERPROFILE\Desktop\Backup"  # Default to a Backup folder on Desktop
+# Prompt user for directories or use defaults
+$defaultSource = Join-Path $env:USERPROFILE "Documents"
+$defaultBackup = Join-Path $env:USERPROFILE "Backups"
 
-# Create timestamp
+Write-Host "Current Settings:"
+Write-Host "Default source directory: $defaultSource"
+Write-Host "Default backup directory: $defaultBackup"
+Write-Host "`nPress Enter to use defaults or input new paths:"
+
+$sourceInput = Read-Host "Enter source directory path (or press Enter for default)"
+$backupInput = Read-Host "Enter backup directory path (or press Enter for default)"
+
+# Use input or default values
+$sourceDirectory = if ($sourceInput) { $sourceInput } else { $defaultSource }
+$backupRoot = if ($backupInput) { $backupInput } else { $defaultBackup }
+$logFile = Join-Path $backupRoot "backup_log.txt"
+$maxBackups = 5
+
+# Create timestamp for backup folder
 $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm"
-$backupPath = Join-Path $backupDirectory "Backup_$timestamp"
+$backupDirectory = Join-Path $backupRoot "Backup_$timestamp"
 
-Write-Host "Starting backup process..."
-Write-Host "From: $sourceDirectory"
-Write-Host "To: $backupPath"
-
-try {
-    # Check if source exists
-    if (-not (Test-Path $sourceDirectory)) {
-        throw "Source directory not found: $sourceDirectory"
+# Function to write to log file
+function Write-Log {
+    param($Message)
+    $logMessage = "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'): $Message"
+    
+    # Create log directory if it doesn't exist
+    $logDir = Split-Path $logFile -Parent
+    if (-not (Test-Path $logDir)) {
+        New-Item -ItemType Directory -Path $logDir -Force | Out-Null
     }
-
-    # Create backup directory if it doesn't exist
-    if (-not (Test-Path $backupDirectory)) {
-        Write-Host "Creating backup directory..."
-        New-Item -ItemType Directory -Path $backupDirectory -Force
-    }
-
-    # Perform the backup
-    Write-Host "Copying files..."
-    Copy-Item -Path $sourceDirectory -Destination $backupPath -Recurse -Force
-
-    Write-Host "Backup completed successfully!" -ForegroundColor Green
-    Write-Host "Files backed up to: $backupPath"
-
-} catch {
-    Write-Host "Error occurred during backup:" -ForegroundColor Red
-    Write-Host $_.Exception.Message -ForegroundColor Red
+    
+    Add-Content -Path $logFile -Value $logMessage
+    Write-Host $logMessage
 }
 
-Write-Host "`nPress any key to exit..."
-$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+# Function to remove old backups
+function Remove-OldBackups {
+    if (Test-Path $backupRoot) {
+        $backups = Get-ChildItem -Path $backupRoot -Directory | Sort-Object CreationTime -Descending
+        if ($backups.Count -gt $maxBackups) {
+            Write-Log "Removing old backups to maintain limit of $maxBackups"
+            $backups | Select-Object -Skip $maxBackups | ForEach-Object {
+                Remove-Item $_.FullName -Recurse -Force
+                Write-Log "Removed old backup: $($_.Name)"
+            }
+        }
+    }
+}
+
+# Main backup process
+try {
+    Write-Host "`nVerifying directories..."
+    
+    # Create backup directory if it doesn't exist
+    if (-not (Test-Path $backupRoot)) {
+        Write-Host "Creating backup directory: $backupRoot"
+        New-Item -ItemType Directory -Path $backupRoot -Force | Out-Null
+    }
+
+    # Verify source directory exists
+    if (-not (Test-Path $sourceDirectory)) {
+        throw "Source directory does not exist: $sourceDirectory"
+    }
+
+    Write-Log "Starting backup from $sourceDirectory to $backupDirectory"
+
+    # Create new backup
+    Copy-Item -Path $sourceDirectory -Destination $backupDirectory -Recurse -Force
+
+    # Calculate and log backup size
+    $backupSize = (Get-ChildItem -Path $backupDirectory -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
+    Write-Log "Backup completed successfully. Size: $([math]::Round($backupSize, 2)) MB"
+
+    # Clean up old backups
+    Remove-OldBackups
+
+    Write-Host "`nBackup completed successfully. Press any key to exit..."
+    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+
+} catch {
+    Write-Log "ERROR: $($_.Exception.Message)"
+    Write-Host "`nPress any key to exit..."
+    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+    exit 1
+}
