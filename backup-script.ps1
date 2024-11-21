@@ -1,5 +1,3 @@
-# Backup Script with Enhanced Visual Feedback
-
 # Default directories
 $defaultSource = Join-Path $env:USERPROFILE "Documents"
 $defaultBackup = Join-Path $env:USERPROFILE "Backups"
@@ -96,6 +94,24 @@ function Remove-OldBackups {
     }
 }
 
+# Function to compress the backup folder into a zip file
+function Compress-Backup {
+    param (
+        [string]$Source,
+        [string]$Destination
+    )
+
+    try {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        [System.IO.Compression.ZipFile]::CreateFromDirectory($Source, $Destination)
+        Write-Log "Backup successfully compressed to $Destination"
+        Write-Host "`n[Success]: Backup compressed to $Destination"
+    } catch {
+        Write-Log "ERROR during compression: $($_.Exception.Message)"
+        Write-Host "`n[Error]: Compression failed. Check the logfile for details."
+    }
+}
+
 # Main backup process
 try {
     Write-Host "`nVerifying directories..."
@@ -120,7 +136,21 @@ try {
     Write-Host "`n[Cleanup] Removing old backups (if any)..."
     Remove-OldBackups
 
-    Write-Host "`n[Success]: Backup completed successfully."
+    # Compression submenu
+    Write-Host "`n[Compression] Would you like to compress the backup into a zip file?"
+    Write-Host "1. Yes"
+    Write-Host "2. No"
+    $compressChoice = Read-Host "Enter your choice (1 or 2)"
+
+    if ($compressChoice -eq "1") {
+        $zipFile = Join-Path $backupRoot "Backup_$timestamp.zip"
+        Write-Host "`n[Compressing] Creating zip file: $zipFile"
+        Compress-Backup -Source $backupDirectory -Destination $zipFile
+    } else {
+        Write-Host "`n[Skipped] Compression skipped by user."
+    }
+
+    Write-Host "`n[Success]: Backup process completed successfully."
     Write-Host "Logfile: $logFile"
     Write-Host "Press any key to exit..."
     $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
