@@ -1,3 +1,5 @@
+# Backup Script with Compression Option
+
 # Default directories
 $defaultSource = Join-Path $env:USERPROFILE "Documents"
 $defaultBackup = Join-Path $env:USERPROFILE "Backups"
@@ -31,21 +33,26 @@ function Write-Log {
         [string]$Message
     )
     $logMessage = "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'): $Message"
+    
+    # Ensure the log file directory exists
     $logDir = Split-Path $logFile -Parent
     if (-not (Test-Path $logDir)) {
         New-Item -ItemType Directory -Path $logDir -Force | Out-Null
     }
+    
     Add-Content -Path $logFile -Value $logMessage
     Write-Host $logMessage
 }
 
-# Function to show a progress bar
-function Show-Progress {
+# Ensure the backup directory exists
+function Ensure-Directory {
     param (
-        [int]$PercentComplete,
-        [string]$Message
+        [string]$Path
     )
-    Write-Host -NoNewline "`r[$('{0,-3}' -f $PercentComplete)%] $Message"
+    if (-not (Test-Path -Path $Path)) {
+        Write-Host "[Creating]: $Path"
+        New-Item -ItemType Directory -Path $Path -Force | Out-Null
+    }
 }
 
 # Function to copy directory with progress and error handling
@@ -62,7 +69,7 @@ function Copy-WithVisualFeedback {
     foreach ($item in $items) {
         $completed++
         $percent = [math]::Floor(($completed / $totalItems) * 100)
-        Show-Progress -PercentComplete $percent -Message "Copying: $($item.Name)"
+        Write-Host -NoNewline "`r[$('{0,-3}' -f $percent)%] Copying: $($item.Name)"
 
         try {
             $targetPath = Join-Path -Path $Destination -ChildPath $item.FullName.Substring($Source.Length).TrimStart('\')
@@ -102,6 +109,10 @@ function Compress-Backup {
     )
 
     try {
+        if (-not (Test-Path -Path $Source)) {
+            throw "Backup directory not found: $Source"
+        }
+
         Add-Type -AssemblyName System.IO.Compression.FileSystem
         [System.IO.Compression.ZipFile]::CreateFromDirectory($Source, $Destination)
         Write-Log "Backup successfully compressed to $Destination"
@@ -115,11 +126,8 @@ function Compress-Backup {
 # Main backup process
 try {
     Write-Host "`nVerifying directories..."
-
-    if (-not (Test-Path $backupRoot)) {
-        Write-Host "[Creating]: Backup directory $backupRoot"
-        New-Item -ItemType Directory -Path $backupRoot -Force | Out-Null
-    }
+    Ensure-Directory -Path $backupRoot
+    Ensure-Directory -Path $backupDirectory
 
     if (-not (Test-Path $sourceDirectory)) {
         throw "Source directory does not exist: $sourceDirectory"
