@@ -1,19 +1,21 @@
-# Backup Script with Compression Option
+# Backup Script for M122
 
 # Default directories
 $defaultSource = Join-Path $env:USERPROFILE "Documents"
 $defaultBackup = Join-Path $env:USERPROFILE "Backups"
 
-# Display current settings and prompt for inputs
+# Display welcome message
 Write-Host "=============================="
 Write-Host "       Backup Script"
 Write-Host "=============================="
+Write-Host "`nWhere would you be without me? Losing your files! 😉"
 Write-Host "`nDefault Directories:"
 Write-Host "  Source: $defaultSource"
 Write-Host "  Backup: $defaultBackup"
 Write-Host "--------------------------------"
-Write-Host "`nPress Enter to use defaults or input new paths."
+Write-Host "`nPress Enter to use defaults or input new paths. Don't worry, I won't judge!"
 
+# Gather input
 $sourceInput = Read-Host "Enter source directory path (or press Enter for default)"
 $backupInput = Read-Host "Enter backup directory path (or press Enter for default)"
 
@@ -33,13 +35,10 @@ function Write-Log {
         [string]$Message
     )
     $logMessage = "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'): $Message"
-    
-    # Ensure the log file directory exists
     $logDir = Split-Path $logFile -Parent
     if (-not (Test-Path $logDir)) {
         New-Item -ItemType Directory -Path $logDir -Force | Out-Null
     }
-    
     Add-Content -Path $logFile -Value $logMessage
     Write-Host $logMessage
 }
@@ -50,12 +49,12 @@ function Ensure-Directory {
         [string]$Path
     )
     if (-not (Test-Path -Path $Path)) {
-        Write-Host "[Creating]: $Path"
+        Write-Host "[Creating Directory]: $Path"
         New-Item -ItemType Directory -Path $Path -Force | Out-Null
     }
 }
 
-# Function to copy directory with progress and error handling
+# Function to copy directory with progress and jokes
 function Copy-WithVisualFeedback {
     param (
         [string]$Source,
@@ -70,6 +69,16 @@ function Copy-WithVisualFeedback {
         $completed++
         $percent = [math]::Floor(($completed / $totalItems) * 100)
         Write-Host -NoNewline "`r[$('{0,-3}' -f $percent)%] Copying: $($item.Name)"
+        
+        # Random jokes at intervals
+        if ($percent % 25 -eq 0) {
+            $jokes = @(
+                "Why do programmers prefer dark mode? Because light attracts bugs!",
+                "Making backups is like flossing. You only regret it if you don’t do it.",
+                "Why was the computer cold? It left its Windows open!"
+            )
+            Write-Host "`n[Pro Tip]: $($jokes | Get-Random)"
+        }
 
         try {
             $targetPath = Join-Path -Path $Destination -ChildPath $item.FullName.Substring($Source.Length).TrimStart('\')
@@ -125,7 +134,7 @@ function Compress-Backup {
 
 # Main backup process
 try {
-    Write-Host "`nVerifying directories..."
+    Write-Host "`n[Verification]: Checking directories..."
     Ensure-Directory -Path $backupRoot
     Ensure-Directory -Path $backupDirectory
 
@@ -135,37 +144,37 @@ try {
 
     Write-Log "Starting backup from $sourceDirectory to $backupDirectory"
 
-    Write-Host "`n[Backup In Progress] Copying files..."
+    Write-Host "`n[Backup In Progress]: Sit tight, this might take a while..."
     Copy-WithVisualFeedback -Source $sourceDirectory -Destination $backupDirectory
 
     $backupSize = (Get-ChildItem -Path $backupDirectory -Recurse -File | Measure-Object -Property Length -Sum).Sum / 1MB
     Write-Log "Backup completed successfully. Size: $([math]::Round($backupSize, 2)) MB"
 
-    Write-Host "`n[Cleanup] Removing old backups (if any)..."
+    Write-Host "`n[Cleanup]: Removing old backups if needed..."
     Remove-OldBackups
 
     # Compression submenu
-    Write-Host "`n[Compression] Would you like to compress the backup into a zip file?"
+    Write-Host "`n[Compression]: Wanna zip it up? (So it looks cooler!)"
     Write-Host "1. Yes"
-    Write-Host "2. No"
+    Write-Host "2. No, thanks"
     $compressChoice = Read-Host "Enter your choice (1 or 2)"
 
     if ($compressChoice -eq "1") {
         $zipFile = Join-Path $backupRoot "Backup_$timestamp.zip"
-        Write-Host "`n[Compressing] Creating zip file: $zipFile"
+        Write-Host "`n[Compression]: Packing it all in... (Zip file: $zipFile)"
         Compress-Backup -Source $backupDirectory -Destination $zipFile
     } else {
-        Write-Host "`n[Skipped] Compression skipped by user."
+        Write-Host "`n[Skipped]: Compression skipped. We’re done here!"
     }
 
-    Write-Host "`n[Success]: Backup process completed successfully."
+    Write-Host "`n[All Done]: Backup complete! 🎉 Your files are safer than ever."
     Write-Host "Logfile: $logFile"
     Write-Host "Press any key to exit..."
     $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
 
 } catch {
     Write-Log "ERROR: $($_.Exception.Message)"
-    Write-Host "`n[Error]: An error occurred. Check the logfile: $logFile"
+    Write-Host "`n[Error]: Oops! Something went wrong. Check the logfile: $logFile"
     Write-Host "Press any key to exit..."
     $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
     exit 1
