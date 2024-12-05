@@ -1,0 +1,31 @@
+2024-11-14 13:48:38: Starting backup from C:\Users\singh\Documents to C:\Users\singh\Backups\Backup_2024-11-14_13-48
+2024-11-14 13:48:39: Backup completed successfully. Size: 0 MB
+2024-11-14 14:21:17: Starting backup from C:\Users\singh\Documents to C:\Users\singh\Backups\Backup_2024-11-14_14-21
+2024-11-14 14:21:18: Backup completed successfully. Size: 0 MB
+2024-11-21 13:00:04: Starting backup from C:\Users\singh\Documents to C:\Users\singh\Backups\Backup_2024-11-21_13-00
+2024-11-21 13:00:04: Backup completed successfully. Size: 0 MB
+2024-11-21 13:04:49: Starting backup from C:\Users\singh\Documents to C:\Users\singh\Backups\Backup_2024-11-21_13-04
+2024-11-21 13:04:49: Backup completed successfully. Size: 0 MB
+2024-11-21 13:10:43: ERROR: Source directory does not exist: /Downloads
+2024-11-21 13:13:26: ERROR: Source directory does not exist: C:Users/singh/Downloads
+2024-11-21 13:13:47: Starting backup from C:/Users/singh/Downloads to C:\Users\singh\Backups\Backup_2024-11-21_13-13
+argument(s): "Could not find a part of the path 'C:\Users\singh\Backups\Backup_2024-11-21_13-25'."
+2024-11-21 13:26:35: Starting backup from C:/Users/singh/Downloads/M122 to C:\Users\singh\Backups\Backup_2024-11-21_13-26
+2024-11-21 13:26:35: Permission denied or error: Could not find a part of the path 'C:\Users\singh\Backups\Backup_2024-11-21_13-26\nickher.txt'. - Skipped C:\Users\singh\Downloads\M122\nickher.txt
+2024-11-21 13:26:37: Backup completed successfully. Size: 0 MB
+2024-11-21 13:27:02: ERROR during compression: Exception calling "CreateFromDirectory" with "2" argument(s): "Could not find a part of the path 'C:\Users\singh\Backups\Backup_2024-11-21_13-26'."
+2024-11-21 13:35:24: Starting backup from C:/Users/singh/Downloads/M122 to C:\Users\singh\Backups\Backup_2024-11-21_13-35
+2024-11-21 13:35:24: Backup completed successfully. Size: 0 MB
+2024-11-21 13:35:24: Removing old backups to maintain limit of 5
+2024-11-21 13:35:24: Removed old backup: Backup_2024-11-14_13-48
+2024-11-21 13:35:46: Backup successfully compressed to C:\Users\singh\Backups\Backup_2024-11-21_13-35.zip
+2024-11-21 13:54:48: Starting backup from C:/Users/singh/Downloads/M122 to C:\Users\singh\Backups\Backup_2024-11-21_13-54
+2024-11-21 13:54:49: Backup completed successfully. Size: 0 MB
+2024-11-21 13:54:49: Removing old backups to maintain limit of 5
+2024-11-21 13:54:49: Removed old backup: Backup_2024-11-14_14-21
+2024-11-21 13:55:19: Backup successfully compressed to C:\Users\singh\Backups\Backup_2024-11-21_13-54.zip
+2024-11-21 13:57:20: Starting backup from C:/Users/singh/Downloads/M122 to C:\Users\singh\Backups\Backup_2024-11-21_13-57
+2024-11-21 13:57:20: Backup completed successfully. Size: 0 MB
+2024-11-21 13:57:20: Removing old backups to maintain limit of 5
+2024-11-21 13:57:20: Removed old backup: Backup_2024-11-21_13-00
+2024-11-21 13:57:51: Backup successfully compressed to C:\Users\singh\Backups\Backup_2024-11-21_13-57.zip
