@@ -11,6 +11,10 @@ Das **Backup-Skript für M122** ist ein unterhaltsames, PowerShell-basiertes Too
 - Automatische Bereinigung alter Backups.
 
 Und, das Beste: Es lockert den Backup-Prozess mit **dummen Witzen** auf! 🃏
+## Warum
+Ich habe mich für die Verwendung von PowerShell als Skriptsprache und die gewählte Backup-Methode entschieden, weil ich eine Herausforderung gesucht habe und etwas Neues lernen wollte. PowerShell bietet eine großartige Gelegenheit, tiefer in die Automatisierung von Aufgaben und die Verwaltung von Dateisystemen einzutauchen, während ich gleichzeitig meine Fähigkeiten in der Skripterstellung erweitere. 
+
+Die gewählte Backup-Methode ermöglicht es mir, nicht nur grundlegende Funktionen wie das Kopieren von Dateien zu implementieren, sondern auch komplexere Konzepte wie Protokollierung, Komprimierung und automatisches Aufräumen zu integrieren. Dies macht das Projekt anspruchsvoll und lehrreich zugleich. 😊
 
 ---
 
